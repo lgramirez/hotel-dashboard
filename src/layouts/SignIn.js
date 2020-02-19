@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -47,6 +47,32 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function SignIn() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = event => {
+    event.preventDefault();
+
+    const form = new FormData(event.target);
+
+    setUsername(form.get("userId"));
+    setPassword(form.get("password"));
+
+    logUser();
+  };
+
+  const logUser = () => {
+    fetch("http://api.digitalx.com.bo/json/log", {
+      method: "POST", // or 'PUT'
+      body: JSON.stringify({ username, password }), // data can be `string` or {object}!
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => console.log(data));
+  };
+
   const classes = useStyles();
 
   return (
@@ -57,18 +83,18 @@ export default function SignIn() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Ingresa a Pymer
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={handleSubmit}>
           <TextField
             variant="outlined"
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
+            id="userId"
+            label="ID de Usuario"
+            name="userId"
+            autoComplete="userId"
             autoFocus
           />
           <TextField
@@ -77,14 +103,14 @@ export default function SignIn() {
             required
             fullWidth
             name="password"
-            label="Password"
+            label="Contraseña"
             type="password"
             id="password"
             autoComplete="current-password"
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
+            label="Recuérdame"
           />
           <Button
             type="submit"
@@ -93,17 +119,12 @@ export default function SignIn() {
             color="primary"
             className={classes.submit}
           >
-            Sign In
+            Ingresa
           </Button>
           <Grid container>
             <Grid item xs>
               <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
+                Olvidaste la contraseña?
               </Link>
             </Grid>
           </Grid>
