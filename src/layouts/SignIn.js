@@ -47,30 +47,40 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function SignIn() {
-  const [username, setUsername] = useState("");
+  const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = event => {
     event.preventDefault();
-
-    const form = new FormData(event.target);
-
-    setUsername(form.get("userId"));
-    setPassword(form.get("password"));
-
     logUser();
   };
 
+  const handleChange = event => {
+    console.log(event.target.name + " " + event.target.value);
+    if (event.target.name === "userId") {
+      setUserId(event.target.value);
+    } else {
+      setPassword(event.target.value);
+    }
+  };
+
   const logUser = () => {
+    const data = JSON.stringify({
+      user: { username: userId, password: password }
+    });
+    console.log(data);
     fetch("http://api.digitalx.com.bo/json/log", {
-      method: "POST", // or 'PUT'
-      body: JSON.stringify({ username, password }), // data can be `string` or {object}!
+      method: "POST",
+      mode: "no-cors",
+      body: data,
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
       }
     })
-      .then(res => res.json())
-      .then(data => console.log(data));
+      .then(res => console.log(res.json()))
+      .then(data => console.log(data))
+      .catch(error => console.error("Error:", error));
   };
 
   const classes = useStyles();
@@ -96,6 +106,8 @@ export default function SignIn() {
             name="userId"
             autoComplete="userId"
             autoFocus
+            value={userId}
+            onChange={handleChange}
           />
           <TextField
             variant="outlined"
@@ -107,6 +119,8 @@ export default function SignIn() {
             type="password"
             id="password"
             autoComplete="current-password"
+            value={password}
+            onChange={handleChange}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
